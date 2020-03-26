@@ -7,17 +7,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using MySql.Data;
-using MySql.Data.MySqlClient;
-using BPI_fix.Models;
-using BPI_fix.Services;
 using System.Data.OleDb;
+using BPI_fix.Models;
+using MySql.Data.MySqlClient;
+using MySql.Data;
+using BPI_fix.Services;
 
 namespace BPI_fix
 {
-    public partial class FBPI : Form
+    public partial class BPI : Form
     {
-        public FBPI()
+        public BPI()
         {
             InitializeComponent();
         }
@@ -29,55 +29,49 @@ namespace BPI_fix
         List<HistoryModel> historyList = new List<HistoryModel>();
 
         List<ErrorModel> errorList = new List<ErrorModel>();
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-           
-        }
-
-        private void FBPI_Load(object sender, EventArgs e)
-        {
-
-        }
-
         private void checkToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            
             LoadBranches();
             GetRegular();
             GetMC();
-            GetF5();
-            GetF6();
+            GetB3();
+            GetB4();
+            GetB6();
             dbcon.DBCon();
-               dataGridView1.Rows.Clear();
+            dgvBPI.Rows.Clear();
 
-               dataGridView1.Refresh();
-            dbcon.GetHistoryFBPI(historyList);
+            dgvBPI.Refresh();
+            dbcon.GetHistory(historyList);
             CheckErrors();
-
+        
 
             BindingSource checkBind = new BindingSource();
 
             checkBind.DataSource = errorList;
 
-            dataGridView1.DataSource = checkBind;
-           // MessageBox.Show(branchList[0].LastNo_Regular.ToString() + " - " + branchList[0].LastNo_MC.ToString() + " - " + branchList[0].LastNo_B3.ToString() + " - " + branchList[0].LastNo_B4.ToString());
+            dgvBPI.DataSource = checkBind;
+            //MessageBox.Show(branchList[0].LastNo_Regular.ToString() + " - " + branchList[0].LastNo_B3.ToString() + " - " +
+            //     branchList[0].LastNo_B4.ToString() + " - " + branchList[0].LastNo_B6.ToString());
+            //MessageBox.Show("Done!");
+        }
+
+        private void dgvBPI_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
         private void LoadBranches()
         {
-            //string connString = @"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" + Application.StartupPath + "; Extended Properties=dBASE III;";
+            string connString = @"Provider=Microsoft.Jet.OLEDB.4.0; Data Source="+Application.StartupPath+"; Extended Properties=dBASE III;";
             //string connString = @"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=\\192.168.0.247\captive\Auto\BPI\Regular_Orders; Extended Properties=dBASE III;";
-            OleDbConnection conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=\\192.168.0.247\\captive\\Auto\\BPI\\Regular_Orders; Extended Properties=DBASE IV;");
-            // OleDbConnection conn = new OleDbConnection(connString);
+
+            OleDbConnection conn = new OleDbConnection(connString);
 
             conn.Open();
 
             DataSet dataset = new DataSet();
-            string script = "Select BRSTN, ADDRESS1 from Temp2";
-            OleDbDataAdapter da = new OleDbDataAdapter(script, conn);
+            string script = "Select BRSTN, ADDRESS1 from Temp1";
+            OleDbDataAdapter da = new OleDbDataAdapter(script,conn);
 
             da.Fill(dataset);
 
@@ -97,10 +91,10 @@ namespace BPI_fix
         }
         private void GetRegular()
         {
-            //string connString = @"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" + Application.StartupPath + @"\Family; Extended Properties=dBASE III;";
+            string connString = @"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" + Application.StartupPath + @"\Regular; Extended Properties=dBASE III;";
             //string connString = "Provider=Microsoft.Jet.OLEDB.4.0; Data Source=\\\\192.168.0.247\\captive\\Auto\\BPI\\Regular_Orders\\Regular; Extended Properties=DBASE IV;";
-            OleDbConnection conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=\\192.168.0.247\\captive\\Auto\\BPI\\Regular_Orders\\Family; Extended Properties=DBASE IV;");
-            //OleDbConnection conn = new OleDbConnection(@connString);
+
+            OleDbConnection conn = new OleDbConnection(@connString);
 
             conn.Open();
 
@@ -121,8 +115,8 @@ namespace BPI_fix
                 var branch = branchList.FirstOrDefault(r => r.BRSTN == BRSTN);
 
                 if (branch != null)
-                    branch.LastNo_Regular = LastNO;
-
+                        branch.LastNo_Regular = LastNO;              
+    
             }
 
             conn.Close();
@@ -130,10 +124,10 @@ namespace BPI_fix
 
         private void GetMC()
         {
-            //string connString = @"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" + Application.StartupPath + @"\FBPI_MC; Extended Properties=dBASE III;";
+            string connString = @"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" + Application.StartupPath + @"\RBPI_MC; Extended Properties=dBASE III;";
             //string connString = @"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=\\192.168.0.247\captive\Auto\BPI\Regular_Orders\RBPI_MC; Extended Properties=DBASE IV;";
-            OleDbConnection conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=\\192.168.0.247\\captive\\Auto\\BPI\\Regular_Orders\\FBPI_MC; Extended Properties=DBASE IV;");
-            //OleDbConnection conn = new OleDbConnection(@connString);
+
+            OleDbConnection conn = new OleDbConnection(@connString);
 
             conn.Open();
 
@@ -148,7 +142,7 @@ namespace BPI_fix
             foreach (DataRow dr in dt.Rows)
             {
                 string BRSTN = dr[0].ToString();
-                // string CheckType = dr[1].ToString();
+               // string CheckType = dr[1].ToString();
                 Int64 LastNO = Int64.Parse(dr[1].ToString().Replace("'", ""));
 
                 var branch = branchList.FirstOrDefault(r => r.BRSTN == BRSTN);
@@ -159,12 +153,13 @@ namespace BPI_fix
 
             conn.Close();
         }
-        private void GetF5()
+        private void GetB3()
         {
-            //string connString = @"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" + Application.StartupPath + @"\F5; Extended Properties=dBASE III;";
+            string connString = @"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" + Application.StartupPath + @"\B3; Extended Properties=dBASE III;";
             //string connString = @"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=\\192.168.0.247\captive\Auto\BPI\Regular_Orders\B3; Extended Properties=DBASE IV;";
-            //  OleDbConnection conn = new OleDbConnection(@connString);
-            OleDbConnection conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=\\192.168.0.247\\captive\\Auto\\BPI\\Regular_Orders\\F5; Extended Properties=DBASE IV;");
+
+            OleDbConnection conn = new OleDbConnection(@connString);
+
             conn.Open();
 
             DataSet dataset = new DataSet();
@@ -190,13 +185,12 @@ namespace BPI_fix
 
             conn.Close();
         }
-        private void GetF6()
+        private void GetB4()
         {
+            string connString = @"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" + Application.StartupPath + @"\B4; Extended Properties=dBASE III;";
+            //string connString = @"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=\\192.168.0.247\captive\Auto\BPI\Regular_Orders\B4; Extended Properties=DBASE IV;";
 
-            //string connString = @"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" + Application.StartupPath + @"\F6; Extended Properties=dBASE III;";
-            OleDbConnection conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=\\192.168.0.247\\captive\\Auto\\BPI\\Regular_Orders\\F6; Extended Properties=DBASE IV;");
-
-            //OleDbConnection conn = new OleDbConnection(@connString);
+            OleDbConnection conn = new OleDbConnection(@connString);
 
             conn.Open();
 
@@ -224,7 +218,39 @@ namespace BPI_fix
             conn.Close();
         }
 
-   
+        private void GetB6()
+        {
+            string connString = @"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" + Application.StartupPath + @"\B6; Extended Properties=dBASE III;";
+            //string connString = @"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=\\192.168.0.247\captive\Auto\BPI\Regular_Orders\B6; Extended Properties=DBASE IV;";
+
+            OleDbConnection conn = new OleDbConnection(@connString);
+
+            conn.Open();
+
+            DataSet dataset = new DataSet();
+
+            OleDbDataAdapter comm = new OleDbDataAdapter("SELECT RTNO, LASTNO FROM Ref", conn);
+
+            comm.Fill(dataset);
+
+            DataTable dt = dataset.Tables[0];
+
+            foreach (DataRow dr in dt.Rows)
+            {
+                string BRSTN = dr[0].ToString();
+                //string CheckType = dr[1].ToString();
+                Int64 LastNO = Int64.Parse(dr[1].ToString().Replace("'", ""));
+
+                var branch = branchList.FirstOrDefault(r => r.BRSTN == BRSTN);
+
+                if (branch != null)
+                    branch.LastNo_B6 = LastNO;
+
+            }
+
+            conn.Close();
+        }
+
         private void CheckErrors()
         {
             historyList.ForEach(hist =>
@@ -233,10 +259,10 @@ namespace BPI_fix
 
                 if (branch != null)
                 {
-                    if (hist.ChequeName == "Family Personal Check (F1)" || hist.ChequeName == "Family Personal Check (F2)"
-                    || hist.ChequeName == "Family Personal Check (F7)" || hist.ChequeName == "Family Personal Check (F8)"
-                    || hist.ChequeName == "Family Commercial Check (F1)" || hist.ChequeName == "Family Commercial Check (F2)"
-                    || hist.ChequeName == "Family Commercial Check (F7)" || hist.ChequeName == "Family Commercial Check (F8)")
+                    if (hist.ChequeName == "Regular Personal Check (B1)" || hist.ChequeName == "Regular Personal Check (B2)"
+                    || hist.ChequeName == "Regular Personal Check (B7)" || hist.ChequeName == "Regular Personal Check (B8)"
+                    || hist.ChequeName == "Regular Commercial Check (B1)" || hist.ChequeName == "Regular Commercial Check (B2)"
+                    || hist.ChequeName == "Regular Commercial Check (B7)" || hist.ChequeName == "Regular Commercial Check (B8)")
                     {
                         if (hist.MaxEnding > branch.LastNo_Regular)
                         {
@@ -252,6 +278,7 @@ namespace BPI_fix
                             errorList.Add(error);
                         }
                     }
+                    
                     else if (hist.ChequeName == "Manager's Checks")
                     {
                         if (hist.MaxEnding > branch.LastNo_MC)
@@ -268,23 +295,7 @@ namespace BPI_fix
                             errorList.Add(error);
                         }
                     }
-                    else if (hist.ChequeName == "Mortgage Check (F5A)")
-                    {
-                        if (hist.MaxEnding > branch.LastNo_B3)
-                        {
-                            ErrorModel error = new ErrorModel
-                            {
-                                BRSTN = branch.BRSTN,
-                                BranchName = branch.BranchName,
-                                CheckType = "Mortgage Check (F5A)",
-                                HistorySerial = hist.MaxEnding,
-                                CurrentSerial = branch.LastNo_B4
-                            };
-
-                            errorList.Add(error);
-                        }
-                    }
-                    else if (hist.ChequeName == "Starter Check (F6A)")
+                    else if (hist.ChequeName == "Direct Check (B4)")
                     {
                         if (hist.MaxEnding > branch.LastNo_B4)
                         {
@@ -292,7 +303,23 @@ namespace BPI_fix
                             {
                                 BRSTN = branch.BRSTN,
                                 BranchName = branch.BranchName,
-                                CheckType = "Starter Check (F6A)",
+                                CheckType = "Direct Check (B4)",
+                                HistorySerial = hist.MaxEnding,
+                                CurrentSerial = branch.LastNo_B4
+                            };
+
+                            errorList.Add(error);
+                        }
+                    }
+                    else if (hist.ChequeName == "Dollar Check (B3)")
+                    {
+                        if (hist.MaxEnding > branch.LastNo_B3)
+                        {
+                            ErrorModel error = new ErrorModel
+                            {
+                                BRSTN = branch.BRSTN,
+                                BranchName = branch.BranchName,
+                                CheckType = "Dollar Check (B3)",
                                 HistorySerial = hist.MaxEnding,
                                 CurrentSerial = branch.LastNo_B3
                             };
@@ -300,7 +327,23 @@ namespace BPI_fix
                             errorList.Add(error);
                         }
                     }
-                  
+                    else if (hist.ChequeName == "Starter Check")
+                    {
+                        if (hist.MaxEnding > branch.LastNo_B6)
+                        {
+                            ErrorModel error = new ErrorModel
+                            {
+                                BRSTN = branch.BRSTN,
+                                BranchName = branch.BranchName,
+                                CheckType = "Starter Check",
+                                HistorySerial = hist.MaxEnding,
+                                CurrentSerial = branch.LastNo_B6
+                            };
+
+                            errorList.Add(error);
+                        }
+                    }
+                    
                 }
             });
         }
@@ -310,27 +353,27 @@ namespace BPI_fix
 
             OleDbCommand command;
             dbcon.DBCon();
-
+        
 
             var Regular = errorList.Where(r => r.CheckType == "Regular Checks").ToList();
-
+        
 
             if (Regular != null)
             {
-                //conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" + Application.StartupPath + @"\Family; Extended Properties=DBASE IV;");
-                conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=\\192.168.0.247\\captive\\Auto\\BPI\\Regular_Orders\\Family; Extended Properties=DBASE IV;");
+                conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" + Application.StartupPath + @"\Regular; Extended Properties=DBASE IV;");
+                //conn = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0; Data Source=\\\\192.168.0.247\\captive\\Auto\\BPI\\Regular_Orders\\Regular; Extended Properties=DBASE IV;");
 
                 conn.Open();
 
                 Regular.ForEach(p =>
                 {
                     //UPDATE REF
-                    command = new OleDbCommand("UPDATE Ref SET LASTNO = '" + p.HistorySerial + "' WHERE RTNO = '" + p.BRSTN + "'", conn);
+                    command = new OleDbCommand("UPDATE Ref SET LASTNO = '" + p.HistorySerial + "' WHERE RTNO = '" + p.BRSTN +"'", conn);
 
                     command.ExecuteNonQuery();
 
                     ////SAVE TO HISTORY
-                    dbcon.InsertDataFBPI(p, DateTime.Now.ToString("yyyy-MM-dd"), "Regular Checks");
+                    dbcon.InsertDataBPI(p, DateTime.Now.ToString("yyyy-MM-dd"), "Regular Checks");
                 });
                 conn.Close();
             }
@@ -339,8 +382,8 @@ namespace BPI_fix
 
             if (ManagersCheck != null)
             {
-                //conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" + Application.StartupPath + @"\FBPI_MC; Extended Properties=DBASE IV;");
-                conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=\\192.168.0.247\\captive\\Auto\\BPI\\Regular_Orders\\FBPI_MC; Extended Properties=DBASE IV;");
+                conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" + Application.StartupPath + @"\RBPI_MC; Extended Properties=DBASE IV;");
+                //conn = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0; Data Source=\\\\192.168.0.254\\captive\\Auto\\SBTC\\Regular\\MC; Extended Properties=DBASE IV;");
 
                 conn.Open();
 
@@ -358,16 +401,16 @@ namespace BPI_fix
                 conn.Close();
             }
 
-            var F5 = errorList.Where(r => r.CheckType == "Mortgage Check (F5A)").ToList();
+            var B3 = errorList.Where(r => r.CheckType == "Dollar Check (B3)").ToList();
 
-            if (F5 != null)
+            if (B3 != null)
             {
-                //conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" + Application.StartupPath + @"\F5; Extended Properties=DBASE IV;");
-                conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=\\192.168.0.247\\captive\\Auto\\BPI\\Regular_Orders\\F5; Extended Properties=DBASE IV;");
+                conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" + Application.StartupPath + @"\B3; Extended Properties=DBASE IV;");
+                //conn = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0; Data Source=\\\\192.168.0.254\\captive\\Auto\\SBTC\\Regular\\GiftCheck; Extended Properties=DBASE IV;");
 
                 conn.Open();
 
-                F5.ForEach(b =>
+                B3.ForEach(b =>
                 {
                     //UPDATE REF
                     command = new OleDbCommand("UPDATE Ref SET LASTNO = '" + b.HistorySerial + "' WHERE RTNO = '" + b.BRSTN + "'", conn);
@@ -375,23 +418,23 @@ namespace BPI_fix
                     command.ExecuteNonQuery();
 
                     ////SAVE TO HISTORY
-                    dbcon.InsertDataFBPI(b, DateTime.Now.ToString("yyyy-MM-dd"), "Mortgage Check (F5A)");
+                    dbcon.InsertDataBPI(b, DateTime.Now.ToString("yyyy-MM-dd"), "Dollar Check (B3)");
                 });
 
                 conn.Close();
             }
 
-            var F6 = errorList.Where(r => r.CheckType == "Starter Check (F6A)").ToList();
+            var B4 = errorList.Where(r => r.CheckType == "Direct Check (B4)").ToList();
+            
 
-
-            if (F6 != null)
+            if (B4 != null)
             {
-                //conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" + Application.StartupPath + @"\F6; Extended Properties=DBASE IV;");
-                conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=\\192.168.0.247\\captive\\Auto\\BPI\\Regular_Orders\\F6; Extended Properties=DBASE IV;");
+                conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" + Application.StartupPath + @"\B4; Extended Properties=DBASE IV;");
+                //conn = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0; Data Source=\\\\192.168.0.254\\captive\\Auto\\SBTC\\Regular\\CheckOne; Extended Properties=DBASE IV;");
 
                 conn.Open();
 
-                F6.ForEach(gc =>
+                B4.ForEach(gc =>
                 {
                     //UPDATE REF
                     command = new OleDbCommand("UPDATE Ref SET LASTNO = '" + gc.HistorySerial + "' WHERE RTNO = '" + gc.BRSTN + "'", conn);
@@ -399,13 +442,58 @@ namespace BPI_fix
                     command.ExecuteNonQuery();
 
                     ////SAVE TO HISTORY
-                    dbcon.InsertDataFBPI(gc, DateTime.Now.ToString("yyyy-MM-dd"), "Starter Check (F6A)");
+                    dbcon.InsertDataBPI(gc, DateTime.Now.ToString("yyyy-MM-dd"), "Direct Check (B4)");
                 });
 
+               conn.Close();
+            }
+
+            var B6 = errorList.Where(r => r.CheckType == "Starter Check").ToList();
+            
+
+            if (B6 != null)
+            {
+                conn = new OleDbConnection(@"Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" + Application.StartupPath + @"\B6; Extended Properties=DBASE IV;");
+            //    conn = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0; Data Source=\\\\192.168.0.254\\captive\\Auto\\SBTC\\Regular\\CheckOne; Extended Properties=DBASE IV;");
+
+                conn.Open();
+
+                B6.ForEach(gc =>
+                {
+                    //UPDATE REF
+                    command = new OleDbCommand("UPDATE Ref SET LASTNO = '" + gc.HistorySerial + "' WHERE RTNO = '" + gc.BRSTN + "'", conn);
+
+                    command.ExecuteNonQuery();
+
+                    ////SAVE TO HISTORY
+                    dbcon.InsertDataBPI(gc, DateTime.Now.ToString("yyyy-MM-dd"), "Starter Check");
+                });
+
+               
                 conn.Close();
             }
-            
+
             dbcon.DBClosed();
+        }
+
+        private void fIxToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string value = "";
+
+            DialogResult result = InputBox("Admin Credentials", "Input Admin Password", ref value);
+
+            if (result == DialogResult.OK)
+            {
+                if (value == "secret")
+                {
+                    FixError();
+
+                    MessageBox.Show("Bank of the Philippine Islands Database has been Fixed");
+                }
+                else
+                    MessageBox.Show("Invalid Password", "System Error");
+            }
+            dgvBPI.Refresh();
         }
         private static DialogResult InputBox(string title, string promptText, ref string value)
         {
@@ -450,29 +538,14 @@ namespace BPI_fix
             return dialogResult;
         }
 
+        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
+
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Environment.Exit(0);
-        }
-
-        private void fixToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            string value = "";
-
-            DialogResult result = InputBox("Admin Credentials", "Input Admin Password", ref value);
-
-            if (result == DialogResult.OK)
-            {
-                if (value == "secret")
-                {
-                    FixError();
-
-                    MessageBox.Show("Security Bank Database has been Fixed");
-                }
-                else
-                    MessageBox.Show("Invalid Password", "System Error");
-                dataGridView1.Refresh();
-            }
         }
     }
 }

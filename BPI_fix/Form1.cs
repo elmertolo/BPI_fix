@@ -16,11 +16,13 @@ namespace BPI_fix
         {
             InitializeComponent();
         }
-
+        public string activeB = "";
         private void btnBPI_Click(object sender, EventArgs e)
         {
+            activeB = "BPI";
             BPI bpi = new BPI();
             bpi.Show();
+
             this.Hide();
         }
 
@@ -31,6 +33,7 @@ namespace BPI_fix
 
         private void btnFBPI_Click(object sender, EventArgs e)
         {
+            activeB = "FBPI";
             FBPI fbpi = new FBPI();
             fbpi.Show();
             this.Hide();
